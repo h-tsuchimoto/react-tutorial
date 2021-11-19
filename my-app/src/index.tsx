@@ -14,8 +14,9 @@ const Square = (props: SquareProps) => (
   </button>
 )
 
+type BoardState = Array<SquareState>
 type BoardProps = {
-  squares: Array<SquareState>
+  squares: BoardState
   onClick: (i: number) => void
 }
 
@@ -49,7 +50,7 @@ const Board = (props: BoardProps) => {
 }
 
 type GameState = {
-  history: Array<{squares: Array<SquareState>}>
+  history: Array<{squares: BoardState}>
   stepNumber: number
   xIsNext: boolean
 }
