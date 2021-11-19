@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import './index.css';
 
@@ -59,77 +59,72 @@ type GameState = {
   readonly stepNumber: number
 }
 
-class Game extends React.Component<{}, GameState> {
-  constructor(props: {}) {
-    super(props);
-    this.state = {
-      history: [{
-        squares: Array(9).fill(null),
-        xIsNext: true,
-      }],
-      stepNumber: 0,
-    }
+const Game = () => {
+  const [state, setState] = useState<GameState>({
+    history: [{
+      squares: Array(9).fill(null),
+      xIsNext: true,
+    }],
+    stepNumber: 0,
+  })
+
+  const current = state.history[state.stepNumber];
+  const winner = calculateWinner(current.squares);
+  let status: string;
+  if (winner) {
+    status = 'Winner: ' + winner;
+  } else {
+    status = 'Next player: ' + (current.xIsNext ? 'X' : 'O');
   }
 
-  render() {
-    const history = this.state.history;
-    const current = history[this.state.stepNumber];
-    const winner = calculateWinner(current.squares);
-
-    let status: string;
-    if (winner) {
-      status = 'Winner: ' + winner;
-    } else {
-      status = 'Next player: ' + (current.xIsNext ? 'X' : 'O');
+  const handleClick = (i: number) => {
+    if (winner || current.squares[i]) {
+      return;
     }
 
-    const handleClick = (i: number) => {
-      const history = this.state.history.slice(0, this.state.stepNumber + 1);
-      const current = history[history.length - 1];
-      const squares = current.squares.slice();
-      if (calculateWinner(squares) || squares[i]) {
-        return;
-      }
-      squares[i] = current.xIsNext ? 'X' : 'O';
-      this.setState({
-        history: history.concat([{
-          squares: squares,
-          xIsNext: !current.xIsNext,
-        }]),
-        stepNumber: history.length,
-      });
-    }
+    const history = state.history.slice(0, state.stepNumber + 1);
+    const squares = current.squares.slice();
+    squares[i] = current.xIsNext ? 'X' : 'O';
 
-    const jumpTo = (step: number) => {
-      this.setState({
-        stepNumber: step,
-      })
-    }
+    setState({
+      history: history.concat([{
+        squares: squares,
+        xIsNext: !current.xIsNext,
+      }]),
+      stepNumber: history.length,
+    });
+  }
 
-    const moves = history.map((step, move) => {
-      const desc = move ? `Go to move #${move}` : 'Go to game start';
-      return (
-        <li key={move}>
-          <button onClick={() => jumpTo(move)}>{desc}</button>
-        </li>
-      )
-    })
+  const jumpTo = (step: number) => {
+    setState(prev => ({
+      ...prev,
+      stepNumber: step,
+    }))
+  }
 
+  const moves = state.history.map((step, move) => {
+    const desc = move ? `Go to move #${move}` : 'Go to game start';
     return (
-      <div className="game">
-          <div className="game-board">
-            <Board
-              squares={current.squares}
-              onClick={(i) => handleClick(i)}
-            />
-          </div>
-          <div className="game-info">
-            <div>{status}</div>
-            <ol>{moves}</ol>
-          </div>
-      </div>
-    );
-  }
+      <li key={move}>
+        <button onClick={() => jumpTo(move)}>{desc}</button>
+      </li>
+    )
+  })
+
+  return (
+    <div className="game">
+        <div className="game-board">
+          <Board
+            squares={current.squares}
+            onClick={(i) => handleClick(i)}
+          />
+        </div>
+        <div className="game-info">
+          <div>{status}</div>
+          <ol>{moves}</ol>
+        </div>
+    </div>
+  );
 }
 
 function calculateWinner(squares: Array<string>) {
