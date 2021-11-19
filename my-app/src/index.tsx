@@ -49,10 +49,14 @@ const Board = (props: BoardProps) => {
   );
 }
 
+type Step = {
+  readonly squares: BoardState
+  readonly xIsNext: boolean
+}
+
 type GameState = {
-  history: Array<{squares: BoardState}>
-  stepNumber: number
-  xIsNext: boolean
+  readonly history: Array<Step>
+  readonly stepNumber: number
 }
 
 class Game extends React.Component<{}, GameState> {
@@ -61,9 +65,9 @@ class Game extends React.Component<{}, GameState> {
     this.state = {
       history: [{
         squares: Array(9).fill(null),
+        xIsNext: true,
       }],
       stepNumber: 0,
-      xIsNext: true,
     }
   }
 
@@ -74,20 +78,19 @@ class Game extends React.Component<{}, GameState> {
     if (calculateWinner(squares) || squares[i]) {
       return;
     }
-    squares[i] = this.state.xIsNext ? 'X' : 'O';
+    squares[i] = current.xIsNext ? 'X' : 'O';
     this.setState({
       history: history.concat([{
         squares: squares,
+        xIsNext: !current.xIsNext,
       }]),
       stepNumber: history.length,
-      xIsNext: !this.state.xIsNext,
     });
   }
 
   jumpTo(step: number) {
     this.setState({
       stepNumber: step,
-      xIsNext: (step % 2) === 0,
     })
   }
 
@@ -111,7 +114,7 @@ class Game extends React.Component<{}, GameState> {
     if (winner) {
       status = 'Winner: ' + winner;
     } else {
-      status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
+      status = 'Next player: ' + (current.xIsNext ? 'X' : 'O');
     }
 
     return (
