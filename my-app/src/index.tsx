@@ -71,44 +71,10 @@ class Game extends React.Component<{}, GameState> {
     }
   }
 
-  handleClick(i: number) {
-    const history = this.state.history.slice(0, this.state.stepNumber + 1);
-    const current = history[history.length - 1];
-    const squares = current.squares.slice();
-    if (calculateWinner(squares) || squares[i]) {
-      return;
-    }
-    squares[i] = current.xIsNext ? 'X' : 'O';
-    this.setState({
-      history: history.concat([{
-        squares: squares,
-        xIsNext: !current.xIsNext,
-      }]),
-      stepNumber: history.length,
-    });
-  }
-
-  jumpTo(step: number) {
-    this.setState({
-      stepNumber: step,
-    })
-  }
-
   render() {
     const history = this.state.history;
     const current = history[this.state.stepNumber];
     const winner = calculateWinner(current.squares);
-
-    const moves = history.map((step, move) => {
-      const desc = move ?
-        'Go to move #' + move :
-        'Go to game start';
-      return (
-        <li key={move}>
-          <button onClick={() => this.jumpTo(move)}>{desc}</button>
-        </li>
-      )
-    })
 
     let status: string;
     if (winner) {
@@ -117,12 +83,44 @@ class Game extends React.Component<{}, GameState> {
       status = 'Next player: ' + (current.xIsNext ? 'X' : 'O');
     }
 
+    const handleClick = (i: number) => {
+      const history = this.state.history.slice(0, this.state.stepNumber + 1);
+      const current = history[history.length - 1];
+      const squares = current.squares.slice();
+      if (calculateWinner(squares) || squares[i]) {
+        return;
+      }
+      squares[i] = current.xIsNext ? 'X' : 'O';
+      this.setState({
+        history: history.concat([{
+          squares: squares,
+          xIsNext: !current.xIsNext,
+        }]),
+        stepNumber: history.length,
+      });
+    }
+
+    const jumpTo = (step: number) => {
+      this.setState({
+        stepNumber: step,
+      })
+    }
+
+    const moves = history.map((step, move) => {
+      const desc = move ? `Go to move #${move}` : 'Go to game start';
+      return (
+        <li key={move}>
+          <button onClick={() => jumpTo(move)}>{desc}</button>
+        </li>
+      )
+    })
+
     return (
       <div className="game">
           <div className="game-board">
             <Board
               squares={current.squares}
-              onClick={(i) => this.handleClick(i)}
+              onClick={(i) => handleClick(i)}
             />
           </div>
           <div className="game-info">
