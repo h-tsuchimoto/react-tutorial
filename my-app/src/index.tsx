@@ -72,9 +72,9 @@ const Game = () => {
   const winner = calculateWinner(current.squares);
   let status: string;
   if (winner) {
-    status = 'Winner: ' + winner;
+    status = `Winner: ${winner}`;
   } else {
-    status = 'Next player: ' + (current.xIsNext ? 'X' : 'O');
+    status = `Next player: ${current.xIsNext ? 'X' : 'O'}`;
   }
 
   const handleClick = (i: number) => {
@@ -82,23 +82,29 @@ const Game = () => {
       return;
     }
 
-    const history = state.history.slice(0, state.stepNumber + 1);
-    const squares = current.squares.slice();
-    squares[i] = current.xIsNext ? 'X' : 'O';
+    const next: Step = (({ squares, xIsNext }) => {
+      const nextSquares = squares.slice() as BoardState
+      nextSquares[i] = xIsNext ? 'X' : 'O'
+      return {
+        squares: nextSquares,
+        xIsNext: !xIsNext
+      }
+    })(current)
 
-    setState({
-      history: history.concat([{
-        squares: squares,
-        xIsNext: !current.xIsNext,
-      }]),
-      stepNumber: history.length,
+    setState(({ history, stepNumber }) => {
+      const newHistory = history.slice(0, stepNumber + 1).concat(next);
+
+      return {
+        history: newHistory,
+        stepNumber: newHistory.length - 1,
+      }
     });
   }
 
-  const jumpTo = (step: number) => {
+  const jumpTo = (move: number) => {
     setState(prev => ({
       ...prev,
-      stepNumber: step,
+      stepNumber: move,
     }))
   }
 
@@ -116,7 +122,7 @@ const Game = () => {
         <div className="game-board">
           <Board
             squares={current.squares}
-            onClick={(i) => handleClick(i)}
+            onClick={handleClick}
           />
         </div>
         <div className="game-info">
