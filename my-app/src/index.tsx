@@ -2,9 +2,10 @@ import React from "react";
 import ReactDOM from "react-dom";
 import './index.css';
 
+type SquareState = 'O' | 'X' | null
 
 type SquareProps = {
-  value: String
+  value: SquareState
   onClick: () => void
 }
 
@@ -17,7 +18,7 @@ function Square(props: SquareProps) {
 }
 
 type BoardProps = {
-  squares: Array<string>
+  squares: Array<SquareState>
   onClick: (i: number) => void
 }
 
@@ -55,7 +56,7 @@ class Board extends React.Component<BoardProps, {}> {
 }
 
 type GameState = {
-  history: Array<{squares: Array<string>}>
+  history: Array<{squares: Array<SquareState>}>
   stepNumber: number
   xIsNext: boolean
 }
