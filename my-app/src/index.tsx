@@ -3,19 +3,16 @@ import ReactDOM from "react-dom";
 import './index.css';
 
 type SquareState = 'O' | 'X' | null
-
 type SquareProps = {
   value: SquareState
   onClick: () => void
 }
 
-function Square(props: SquareProps) {
-  return (
-    <button className="square" onClick={props.onClick}>
-      {props.value}
-    </button>
-  );
-}
+const Square = (props: SquareProps) => (
+  <button className="square" onClick={props.onClick}>
+    {props.value}
+  </button>
+)
 
 type BoardProps = {
   squares: Array<SquareState>
